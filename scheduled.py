@@ -6,9 +6,7 @@ from slackclient import SlackClient
 
 logging.basicConfig(level=logging.DEBUG)
 
-def sendMessage(slack_client):
-  msg = "Good Morning!"
-
+def sendMessage(slack_client, msg):
   # make the POST request through the python slack client
   updateMsg = slack_client.api_call(
     "chat.postMessage",
@@ -28,9 +26,10 @@ if __name__ == "__main__":
   logging.debug("authorized slack client")
 
   # # For testing
-  schedule.every(60).seconds.do(lambda: sendMessage(slack_client))
+  msg = "Good Morning!"
+  schedule.every(60).seconds.do(lambda: sendMessage(slack_client, msg))
 
-  # schedule.every().monday.at("13:15").do(lambda: sendMessage(slack_client))
+  # schedule.every().monday.at("13:15").do(lambda: sendMessage(slack_client, msg))
   logging.info("entering loop")
 
   while True:
