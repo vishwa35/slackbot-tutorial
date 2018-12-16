@@ -19,21 +19,21 @@ def verify_slack_token(request_token):
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
 
-@app.route("/slack/mycommand", methods=["POST"])
+@app.route("/slack/test", methods=["POST"])
 def command():
   info = request.form
 
-  # get uid of the user
-  im_id = slack_client.api_call(
-    "im.open",
-    user=info["user_id"]
-  )["channel"]["id"]
+  # # get uid of the user
+  # im_id = slack_client.api_call(
+  #   "im.open",
+  #   user=info["user_id"]
+  # )["channel"]["id"]
 
-  # send user a response via DM
-  ownerMsg = slack_client.api_call(
-    "chat.postMessage",
-    channel=im_id,
-    text=commander.getMessage()
+  # # send user a response via DM
+  # ownerMsg = slack_client.api_call(
+  #   "chat.postMessage",
+  #   channel=im_id,
+  #   text=commander.getMessage()
 
   # send channel a response
   channelMsg = slack_client.api_call(
