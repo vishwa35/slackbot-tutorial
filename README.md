@@ -1,3 +1,3 @@
 # slackbot-tutorial
 
-Used in conjunction with this [tutorial](https://medium.com/@vishwa35/a-basic-slackbot-how-to-for-the-amateur-90b4870841b)
+Used in conjunction with this [tutorial](https://medium.freecodecamp.org/how-to-build-a-basic-slackbot-a-beginners-guide-6b40507db5c5)
