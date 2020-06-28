@@ -2,27 +2,28 @@ import os
 import schedule
 import time
 import logging
-from slackclient import SlackClient
+from slack.web.client import WebClient
+from slack.errors import SlackApiError
 
 logging.basicConfig(level=logging.DEBUG)
 
 def sendMessage(slack_client, msg):
   # make the POST request through the python slack client
-  updateMsg = slack_client.api_call(
-    "chat.postMessage",
-    channel='#test',
-    text=msg
-  )
+  
 
   # check if the request was a success
-  if updateMsg['ok'] is not True:
-    logging.error(updateMsg)
-  else:
-    logging.debug(updateMsg)
+  try:
+    slack_client.chat_postMessage(
+      channel='#test',
+      text=msg
+    )#.get()
+  except SlackApiError as e:
+    logging.error('Request to Slack API Failed: {}.'.format(e.response.status_code))
+    logging.error(e.response)
 
 if __name__ == "__main__":
   SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
-  slack_client = SlackClient(SLACK_BOT_TOKEN)
+  slack_client = WebClient(SLACK_BOT_TOKEN)
   logging.debug("authorized slack client")
 
   # # For testing

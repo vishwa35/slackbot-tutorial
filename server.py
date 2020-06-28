@@ -1,48 +1,56 @@
-from flask import Flask, request, make_response, Response
+import os
 import json
-from tokens import SLACK_BOT_TOKEN, SLACK_VERIFICATION_TOKEN
-from slackclient import SlackClient
-from slashCommand import *
+import logging
 
+from flask import Flask, request, make_response, Response
 
+from slack.web.client import WebClient
+from slack.errors import SlackApiError
+from slack.signature import SignatureVerifier
 
-slack_client = SlackClient(SLACK_BOT_TOKEN)
+from slashCommand import Slash
+
+logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
-
-commander = Slash("Hey there! It works.")
-
-#TODO: Add checks for all responses from slack api calls
-
-def verify_slack_token(request_token):
-    if SLACK_VERIFICATION_TOKEN != request_token:
-        print("Error: invalid verification token!")
-        print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
-        return make_response("Request contains invalid Slack verification token", 403)
 
 @app.route("/slack/test", methods=["POST"])
 def command():
+  if not verifier.is_valid_request(request.get_data(), request.headers):
+    return make_response("invalid request", 403)
   info = request.form
 
-  # # get uid of the user
-  # im_id = slack_client.api_call(
-  #   "im.open",
-  #   user=info["user_id"]
-  # )["channel"]["id"]
-
   # # send user a response via DM
-  # ownerMsg = slack_client.api_call(
-  #   "chat.postMessage",
+  # im_id = slack_client.im_open(user=info["user_id"])["channel"]["id"]
+  # ownerMsg = slack_client.chat_postMessage(
   #   channel=im_id,
   #   text=commander.getMessage()
+  # )
 
-  # send channel a response
-  channelMsg = slack_client.api_call(
-    "chat.postMessage",
-    channel="#" + info["channel_name"],
-    text=commander.getMessage()
+  # # send channel a response
+  # response = slack_client.chat_postMessage(
+  #   channel='#{}'.format(info["channel_name"]), 
+  #   text=commander.getMessage()
+  # )
 
-  return make_response("", 200)
+  try:
+    response = slack_client.chat_postMessage(
+      channel='#{}'.format(info["channel_name"]), 
+      text=commander.getMessage()
+    )#.get()
+  except SlackApiError as e:
+    logging.error('Request to Slack API Failed: {}.'.format(e.response.status_code))
+    logging.error(e.response)
+    return make_response("", e.response.status_code)
+
+  return make_response("", response.status_code)
 
 # Start the Flask server
 if __name__ == "__main__":
+  SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
+  SLACK_SIGNATURE = os.environ['SLACK_SIGNATURE']
+  slack_client = WebClient(SLACK_BOT_TOKEN)
+  verifier = SignatureVerifier(SLACK_SIGNATURE)
+
+  commander = Slash("Hey there! It works.")
+
   app.run()
