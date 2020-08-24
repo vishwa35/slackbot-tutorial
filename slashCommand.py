@@ -6,3 +6,6 @@ class Slash():
 
   def getMessage(self):
       return self.msg
+
+  def foo():
+    pass

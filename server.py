@@ -13,12 +13,26 @@ from slashCommand import Slash
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
+@app.route("/slack/ask", methods=["POST"])
+def interact():
+  info = request.form
+  # print(info)
+  # commander = Slash('interaction test succeeded ')
+  # return make_response("", response.status_code)
+  print(request.__dict__)
+  return info['challenge']
+
 @app.route("/slack/test", methods=["POST"])
 def command():
-  if not verifier.is_valid_request(request.get_data(), request.headers):
-    return make_response("invalid request", 403)
+  # if not verifier.is_valid_request(request.get_data(), request.headers):
+  #   return make_response("invalid request", 403)
   info = request.form
+  acronym = info["text"]
 
+  if(acronym.lower() == 'aws'):
+    commander = Slash('Amazon Web Service')
+  else:
+    commander = Slash('Not found buddy :/ ')
   # # send user a response via DM
   # im_id = slack_client.im_open(user=info["user_id"])["channel"]["id"]
   # ownerMsg = slack_client.chat_postMessage(
@@ -30,7 +44,7 @@ def command():
   # response = slack_client.chat_postMessage(
   #   channel='#{}'.format(info["channel_name"]), 
   #   text=commander.getMessage()
-  # )
+  # ) 
 
   try:
     response = slack_client.chat_postMessage(
@@ -47,10 +61,10 @@ def command():
 # Start the Flask server
 if __name__ == "__main__":
   SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
-  SLACK_SIGNATURE = os.environ['SLACK_SIGNATURE']
+  # SLACK_SIGNATURE = os.environ['SLACK_SIGNATURE']
   slack_client = WebClient(SLACK_BOT_TOKEN)
-  verifier = SignatureVerifier(SLACK_SIGNATURE)
+  # verifier = SignatureVerifier(SLACK_SIGNATURE)
 
-  commander = Slash("Hey there! It works.")
+  # commander = Slash("Hey there! It works.")
 
   app.run()
