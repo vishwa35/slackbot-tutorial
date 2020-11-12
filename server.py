@@ -15,7 +15,6 @@ app = Flask(__name__)
 
 @app.route("/slack/test", methods=["POST"])
 def command():
-  print('+++++++++++++++++++++++++++++++++++++++')
   if not verifier.is_valid_request(request.get_data(), request.headers):
     return make_response("invalid request", 403)
   info = request.form
