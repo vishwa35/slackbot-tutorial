@@ -2,15 +2,14 @@ import os
 import schedule
 import time
 import logging
-from slack.web.client import WebClient
-from slack.errors import SlackApiError
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 logging.basicConfig(level=logging.DEBUG)
 
 def sendMessage(slack_client, msg):
   # make the POST request through the python slack client
   
-
   # check if the request was a success
   try:
     slack_client.chat_postMessage(

@@ -4,9 +4,9 @@ import logging
 
 from flask import Flask, request, make_response, Response
 
-from slack.web.client import WebClient
-from slack.errors import SlackApiError
-from slack.signature import SignatureVerifier
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+from slack_sdk.signature import SignatureVerifier
 
 from slashCommand import Slash
 
@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 @app.route("/slack/test", methods=["POST"])
 def command():
+  print('+++++++++++++++++++++++++++++++++++++++')
   if not verifier.is_valid_request(request.get_data(), request.headers):
     return make_response("invalid request", 403)
   info = request.form
